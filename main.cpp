@@ -1,5 +1,7 @@
 
 #include <iostream>
+#include <optional>
+#include <set>
 
 #define GLFW_INCLUDE_VULKAN
 #define VK_USE_PLATFORM_WIN32_KHR
@@ -116,6 +118,25 @@ vkGetDeviceQueue(device, queueCreateInfo.queueFamilyIndex, 0, &graphicsQueue);
 return instance;
 }
 
+struct QueueFamilyIndices {
+    std::optional<uint32_t> graphicsFamily;
+    std::optional<uint32_t> presentFamily;
+
+    bool isComplete() {
+        return graphicsFamily.has_value() && presentFamily.has_value();
+    }
+};
+
+struct QueueFamilyIndices {
+    uint32_t graphicsFamily;
+};
+
+QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
+    QueueFamilyIndices indices;
+    // Logic to find queue family indices to populate struct with
+    return indices;
+}
+
 int main() {
   std::cout << "hi";
 
@@ -161,12 +182,21 @@ vkGetPhysicalDeviceSurfaceSupportKHR(physicalDev, 0, surface, &presentSupport);
 
 VkQueue presentQueue;
 
-VkDeviceQueueCreateInfo queueCreateInfo{};
+
+QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+
+std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+
+float queuePriority = 1.0f;
+for (uint32_t queueFamily : uniqueQueueFamilies) {
+    VkDeviceQueueCreateInfo queueCreateInfo{};
     queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
     queueCreateInfo.queueFamilyIndex = queueFamily;
     queueCreateInfo.queueCount = 1;
     queueCreateInfo.pQueuePriorities = &queuePriority;
     queueCreateInfos.push_back(queueCreateInfo);
+}
 
   while(!glfwWindowShouldClose(window)) {
       glfwPollEvents();
