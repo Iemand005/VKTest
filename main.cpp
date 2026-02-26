@@ -10,7 +10,23 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
+
 #pragma comment(lib, "vulkan-1.lib")
+
+void initVulkan() {
+  VkApplicationInfo appInfo{};
+  appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+  appInfo.pApplicationName = "Hello Triangle";
+  appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+  appInfo.pEngineName = "Poop Engine";
+  appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+  appInfo.apiVersion = VK_API_VERSION_1_0;
+  // vkCreateInstance()
+
+  VkInstanceCreateInfo createInfo{};
+createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+createInfo.pApplicationInfo = &appInfo;
+}
 
 int main() {
   std::cout << "hi";
@@ -21,21 +37,23 @@ int main() {
   GLFWwindow* window = glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
 
   uint32_t extensionCount = 0;
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+  vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
 
-    std::cout << extensionCount << " extensions supported\n";
+  std::cout << extensionCount << " extensions supported\n";
 
-    glm::mat4 matrix;
-    glm::vec4 vec;
-    auto test = matrix * vec;
+  glm::mat4 matrix;
+  glm::vec4 vec;
+  auto test = matrix * vec;
 
-    while(!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
-    }
+  initVulkan();
 
-    glfwDestroyWindow(window);
+  while(!glfwWindowShouldClose(window)) {
+      glfwPollEvents();
+  }
 
-    glfwTerminate();
+  glfwDestroyWindow(window);
 
-    return 0;
+  glfwTerminate();
+
+  return 0;
 }
