@@ -131,11 +131,51 @@ struct QueueFamilyIndices {
 //     uint32_t graphicsFamily;
 // };
 
+
+bool isDeviceSuitable(VkPhysicalDevice device) {
+    QueueFamilyIndices indices = findQueueFamilies(device);
+
+    return indices.isComplete();
+}
 QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
     QueueFamilyIndices indices;
     // Logic to find queue family indices to populate struct with
+
+    std::optional<uint32_t> graphicsFamily;
+
+std::cout << std::boolalpha << graphicsFamily.has_value() << std::endl; // false
+
+graphicsFamily = 0;
+
+std::cout << std::boolalpha << graphicsFamily.has_value() << std::endl;
+
+uint32_t queueFamilyCount = 0;
+vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+int i = 0;
+for (const auto& queueFamily : queueFamilies) {
+    if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+        indices.graphicsFamily = i;
+    }
+
+    if (indices.isComplete()) {
+        break;
+    }
+
+    i++;
+}
+
+VkBool32 presentSupport = false;
+vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+
+    if (presentSupport) {
+    indices.presentFamily = i;
+}
     return indices;
 }
+VkSurfaceKHR surface;
 
 int main() {
   std::cout << "hi";
@@ -158,7 +198,6 @@ int main() {
   VkPhysicalDevice physicalDevice;
   VkInstance instance = initVulkan(&device, &physicalDevice);
 
-  VkSurfaceKHR surface;
 
 VkWin32SurfaceCreateInfoKHR surfaceCreateInfo{};
 surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
