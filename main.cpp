@@ -70,6 +70,8 @@ int main() {
       glfwPollEvents();
   }
 
+  vkDestroyInstance(instance, nullptr);
+
   glfwDestroyWindow(window);
 
   glfwTerminate();
