@@ -8,5 +8,5 @@ add_subdirectory(external/glm)
 add_subdirectory(external/glfw)
 
 add_executable(main
-  main.hpp
+  main.cpp
 )
