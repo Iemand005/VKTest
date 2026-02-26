@@ -101,11 +101,35 @@ deviceCreateInfo.enabledExtensionCount = 0;
 
   deviceCreateInfo.enabledLayerCount = 0;
 
-  VkDevice device;
 
-  if (vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device) != VK_SUCCESS) {
-    throw std::runtime_error("failed to create logical device!");
+  VkQueue presentQueue;
+
+
+QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+
+std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+
+float queuePriority = 1.0f;
+for (uint32_t queueFamily : uniqueQueueFamilies) {
+    VkDeviceQueueCreateInfo queueCreateInfo{};
+    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueCreateInfo.queueFamilyIndex = queueFamily;
+    queueCreateInfo.queueCount = 1;
+    queueCreateInfo.pQueuePriorities = &queuePriority;
+    queueCreateInfos.push_back(queueCreateInfo);
 }
+
+deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
+
+VkDevice device;
+
+
+if (vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device) != VK_SUCCESS) {
+  throw std::runtime_error("failed to create logical device!");
+}
+vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
 
 VkQueue graphicsQueue;
 
@@ -132,11 +156,8 @@ struct QueueFamilyIndices {
 // };
 
 
-bool isDeviceSuitable(VkPhysicalDevice device) {
-    QueueFamilyIndices indices = findQueueFamilies(device);
+VkSurfaceKHR surface;
 
-    return indices.isComplete();
-}
 QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
     QueueFamilyIndices indices;
     // Logic to find queue family indices to populate struct with
@@ -175,7 +196,17 @@ vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
 }
     return indices;
 }
-VkSurfaceKHR surface;
+
+bool isDeviceSuitable(VkPhysicalDevice device) {
+    QueueFamilyIndices indices = findQueueFamilies(device);
+
+    return indices.isComplete();
+}
+
+bool checkDeviceExtensionSupport(VkPhysicalDevice device) {
+    return true;
+}
+
 
 int main() {
   std::cout << "hi";
@@ -237,8 +268,8 @@ for (uint32_t queueFamily : uniqueQueueFamilies) {
     queueCreateInfos.push_back(queueCreateInfo);
 }
 
-deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
-deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
+// deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+// deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
 
 vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
 
