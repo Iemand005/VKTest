@@ -17,7 +17,9 @@
 
 #pragma comment(lib, "vulkan-1.lib")
 
-VkInstance initVulkan() {
+
+
+VkInstance initVulkan(VkDevice *deviceOut, VkPhysicalDevice *physdev) {
   VkApplicationInfo appInfo{};
   appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
   appInfo.pApplicationName = "Hello Triangle";
@@ -60,13 +62,15 @@ if (deviceCount == 0) {
 std::vector<VkPhysicalDevice> devices(deviceCount);
 vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
-VkPhysicalDevice e = devices.at(0);
+physicalDevice = devices.at(0);
+
+*physdev = physicalDevice;
 
 uint32_t queueFamilyCount = 0;
-vkGetPhysicalDeviceQueueFamilyProperties(e, &queueFamilyCount, nullptr);
+vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
 
 std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-vkGetPhysicalDeviceQueueFamilyProperties(e, &queueFamilyCount, queueFamilies.data());
+vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.data());
 
 int i = 0;
 for (const auto& queueFamily : queueFamilies) {
@@ -107,7 +111,7 @@ vkGetDeviceQueue(device, queueCreateInfo.queueFamilyIndex, 0, &graphicsQueue);
 
 
 
-
+ *deviceOut = device;
 
 return instance;
 }
@@ -129,7 +133,9 @@ int main() {
   glm::vec4 vec;
   auto test = matrix * vec;
 
-  VkInstance instance = initVulkan();
+  VkDevice device;
+  VkPhysicalDevice physicalDev;
+  VkInstance instance = initVulkan(&device, &physicalDev);
 
   VkSurfaceKHR surface;
 
@@ -142,9 +148,32 @@ if (vkCreateWin32SurfaceKHR(instance, &surfaceCreateInfo, nullptr, &surface) != 
     throw std::runtime_error("failed to create window surface!");
 }
 
+if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create window surface!");
+    }
+
+    VkBool32 presentSupport = false;
+vkGetPhysicalDeviceSurfaceSupportKHR(physicalDev, 0, surface, &presentSupport);
+
+// if (presentSupport) {
+//     indices.presentFamily = i;
+// }
+
+VkQueue presentQueue;
+
+VkDeviceQueueCreateInfo queueCreateInfo{};
+    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueCreateInfo.queueFamilyIndex = queueFamily;
+    queueCreateInfo.queueCount = 1;
+    queueCreateInfo.pQueuePriorities = &queuePriority;
+    queueCreateInfos.push_back(queueCreateInfo);
+
   while(!glfwWindowShouldClose(window)) {
       glfwPollEvents();
   }
+
+  vkDestroySurfaceKHR(instance, surface, nullptr);
+    // vkDestroyInstance(instance, nullptr);
 
   vkDestroyInstance(instance, nullptr);
 
