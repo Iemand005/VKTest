@@ -106,7 +106,7 @@ VkQueue graphicsQueue;
 vkGetDeviceQueue(device, queueCreateInfo.queueFamilyIndex, 0, &graphicsQueue);
 
 
-VkSurfaceKHR surface;
+
 
 
 return instance;
@@ -130,6 +130,17 @@ int main() {
   auto test = matrix * vec;
 
   VkInstance instance = initVulkan();
+
+  VkSurfaceKHR surface;
+
+VkWin32SurfaceCreateInfoKHR surfaceCreateInfo{};
+surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+surfaceCreateInfo.hwnd = glfwGetWin32Window(window);
+surfaceCreateInfo.hinstance = GetModuleHandle(nullptr);
+
+if (vkCreateWin32SurfaceKHR(instance, &createInfo, nullptr, &surface) != VK_SUCCESS) {
+    throw std::runtime_error("failed to create window surface!");
+}
 
   while(!glfwWindowShouldClose(window)) {
       glfwPollEvents();
