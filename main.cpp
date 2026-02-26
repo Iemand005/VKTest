@@ -13,7 +13,7 @@
 
 #pragma comment(lib, "vulkan-1.lib")
 
-void initVulkan() {
+VkInstance initVulkan() {
   VkApplicationInfo appInfo{};
   appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
   appInfo.pApplicationName = "Hello Triangle";
@@ -26,6 +26,20 @@ void initVulkan() {
   VkInstanceCreateInfo createInfo{};
 createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 createInfo.pApplicationInfo = &appInfo;
+
+uint32_t glfwExtensionCount = 0;
+const char** glfwExtensions;
+
+glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+createInfo.enabledExtensionCount = glfwExtensionCount;
+createInfo.ppEnabledExtensionNames = glfwExtensions;
+
+createInfo.enabledLayerCount = 0;
+
+VkInstance instance;
+VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
+return instance;
 }
 
 int main() {
@@ -45,7 +59,7 @@ int main() {
   glm::vec4 vec;
   auto test = matrix * vec;
 
-  initVulkan();
+  VkInstance instance = initVulkan();
 
   while(!glfwWindowShouldClose(window)) {
       glfwPollEvents();
