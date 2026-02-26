@@ -237,6 +237,11 @@ for (uint32_t queueFamily : uniqueQueueFamilies) {
     queueCreateInfos.push_back(queueCreateInfo);
 }
 
+deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
+
+vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
+
   while(!glfwWindowShouldClose(window)) {
       glfwPollEvents();
   }
