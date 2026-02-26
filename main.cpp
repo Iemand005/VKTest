@@ -127,9 +127,9 @@ struct QueueFamilyIndices {
     }
 };
 
-struct QueueFamilyIndices {
-    uint32_t graphicsFamily;
-};
+// struct QueueFamilyIndices {
+//     uint32_t graphicsFamily;
+// };
 
 QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
     QueueFamilyIndices indices;
@@ -155,8 +155,8 @@ int main() {
   auto test = matrix * vec;
 
   VkDevice device;
-  VkPhysicalDevice physicalDev;
-  VkInstance instance = initVulkan(&device, &physicalDev);
+  VkPhysicalDevice physicalDevice;
+  VkInstance instance = initVulkan(&device, &physicalDevice);
 
   VkSurfaceKHR surface;
 
@@ -174,7 +174,7 @@ if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) 
     }
 
     VkBool32 presentSupport = false;
-vkGetPhysicalDeviceSurfaceSupportKHR(physicalDev, 0, surface, &presentSupport);
+vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, 0, surface, &presentSupport);
 
 // if (presentSupport) {
 //     indices.presentFamily = i;
